@@ -1,0 +1,58 @@
+@startuml Todo App Class Diagram
+
+class TodoService {
+    - todos: Todo[]
+    - observers: Observer[]
+    + addObserver(observer: Observer)
+    + notify()
+    + addTodo(text: string)
+    + toggleTodoComplete(id: number)
+    + removeTodo(id: number)
+    + getTodos(): Todo[]
+    ..
+    <<Singleton>>
+}
+
+class Controller {
+    - service: TodoService
+    - view: View
+    + initialize()
+    + handleAddTodo(text: string)
+    + handleToggleTodo(id: number)
+    + handleRemoveTodo(id: number)
+}
+
+class View {
+    - input: HTMLElement
+    - addButton: HTMLElement
+    - todoList: HTMLElement
+    + update(todos: Todo[])
+    + bindAddTodo(handler: Function)
+    + bindToggleTodo(handler: Function)
+    + bindRemoveTodo(handler: Function)
+    ..
+    <<Observer>>
+}
+
+interface Observer {
+    + update(todos: Todo[])
+}
+
+class Todo {
+    + id: number
+    + text: string
+    + completed: boolean
+}
+
+TodoService ..|> Observer : implements
+View ..|> Observer : implements
+
+Controller --> TodoService : uses
+Controller --> View : uses
+TodoService --> View : notifies
+
+note right of TodoService : Singleton Pattern
+note right of View : Observer Pattern
+note bottom of Controller : Mediator Pattern
+
+@enduml
